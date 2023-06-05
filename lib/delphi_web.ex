@@ -83,6 +83,7 @@ defmodule DelphiWeb do
     quote do
       # HTML escaping functionality
       import Phoenix.HTML
+      import Phoenix.HTML.Form
       # Core UI components and translation
       import DelphiWeb.CoreComponents
       import DelphiWeb.Gettext
