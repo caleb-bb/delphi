@@ -1,6 +1,7 @@
 defmodule DelphiWeb.TaskLive.FormComponent do
   use DelphiWeb, :live_component
 
+  alias Delphi.Projects
   alias Delphi.Tasks
 
   @impl true
@@ -24,6 +25,14 @@ defmodule DelphiWeb.TaskLive.FormComponent do
         <.input field={@form[:description]} type="text" label="Description" />
         <.input field={@form[:completed]} type="checkbox" label="Completed" />
         <.input field={@form[:duration]} type="number" label="Duration" />
+        <.input
+          :if={@action == :new}
+          field={@form[:project]}
+          type="select"
+          label="Project"
+          options={@projects |> Enum.map(&{&1.title, &1.id})}
+          value={@form.data.name}
+        />
         <:actions>
           <.button phx-disable-with="Saving...">Save Task</.button>
         </:actions>
@@ -34,12 +43,17 @@ defmodule DelphiWeb.TaskLive.FormComponent do
 
   @impl true
   def update(%{task: task} = assigns, socket) do
-    changeset = Tasks.change_task(task)
+    changeset =
+      Tasks.change_task(task)
+      |> IO.inspect(label: "changeset inside of update")
+
+    projects = Projects.list_projects()
 
     {:ok,
      socket
      |> assign(assigns)
-     |> assign_form(changeset)}
+     |> assign_form(changeset)
+     |> assign(projects: projects)}
   end
 
   @impl true
@@ -72,7 +86,9 @@ defmodule DelphiWeb.TaskLive.FormComponent do
   end
 
   defp save_task(socket, :new, task_params) do
-    case Tasks.create_task(task_params) do
+    params_with_project = add_project(task_params)
+
+    case Tasks.create_task(params_with_project) do
       {:ok, task} ->
         notify_parent({:saved, task})
 
@@ -84,6 +100,14 @@ defmodule DelphiWeb.TaskLive.FormComponent do
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign_form(socket, changeset)}
     end
+  end
+
+  defp add_project(params) do
+    project =
+      params["project"]
+      |> Projects.get_project!()
+
+    Map.put(params, "project", project)
   end
 
   defp assign_form(socket, %Ecto.Changeset{} = changeset) do

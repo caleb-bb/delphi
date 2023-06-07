@@ -18,7 +18,9 @@ defmodule Delphi.Tasks do
 
   """
   def list_tasks do
-    Repo.all(Task)
+    Task
+    |> Repo.all()
+    |> Repo.preload(:project)
   end
 
   @doc """
@@ -35,7 +37,7 @@ defmodule Delphi.Tasks do
       ** (Ecto.NoResultsError)
 
   """
-  def get_task!(id), do: Repo.get!(Task, id)
+  def get_task!(id), do: Repo.get!(Task, id) |> Repo.preload(:project)
 
   @doc """
   Creates a task.
@@ -50,8 +52,10 @@ defmodule Delphi.Tasks do
 
   """
   def create_task(attrs \\ %{}) do
+    IO.inspect(attrs, label: "in create")
+
     %Task{}
-    |> Task.changeset(attrs)
+    |> Task.update_changeset(attrs)
     |> Repo.insert()
   end
 
@@ -68,6 +72,8 @@ defmodule Delphi.Tasks do
 
   """
   def update_task(%Task{} = task, attrs) do
+    IO.inspect(attrs, label: "inside of update")
+
     task
     |> Task.changeset(attrs)
     |> Repo.update()
@@ -99,6 +105,8 @@ defmodule Delphi.Tasks do
 
   """
   def change_task(%Task{} = task, attrs \\ %{}) do
-    Task.changeset(task, attrs)
+    task
+    |> Repo.preload(:project)
+    |> Task.changeset(attrs)
   end
 end

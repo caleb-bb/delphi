@@ -17,6 +17,7 @@
   <:col :let={{_id, task}} label="Description"><%= task.description %></:col>
   <:col :let={{_id, task}} label="Completed"><%= task.completed %></:col>
   <:col :let={{_id, task}} label="Duration"><%= task.duration %></:col>
+  <:col :let={{_id, task}} label="Project"><%= task.project.title %></:col>
   <:action :let={{_id, task}}>
     <div class="sr-only">
       <.link navigate={~p"/tasks/#{task}"}>Show</.link>

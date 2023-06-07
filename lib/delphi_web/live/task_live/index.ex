@@ -1,6 +1,7 @@
 defmodule DelphiWeb.TaskLive.Index do
   use DelphiWeb, :live_view
 
+  alias Delphi.Repo
   alias Delphi.Tasks
   alias Delphi.Tasks.Task
 
@@ -23,7 +24,7 @@ defmodule DelphiWeb.TaskLive.Index do
   defp apply_action(socket, :new, _params) do
     socket
     |> assign(:page_title, "New Task")
-    |> assign(:task, %Task{})
+    |> assign(:task, Repo.preload(%Task{}, :project))
   end
 
   defp apply_action(socket, :index, _params) do

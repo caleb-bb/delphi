@@ -10,7 +10,7 @@ defmodule Delphi.Tasks.Task do
     field :name, :string
     field :when, :naive_datetime
 
-    belongs_to :project, Project
+    belongs_to :project, Project, on_replace: :update
 
     timestamps()
   end
@@ -20,7 +20,5 @@ defmodule Delphi.Tasks.Task do
     task
     |> cast(attrs, [:when, :name, :description, :completed, :duration])
     |> validate_required([:when, :name, :description, :completed, :duration])
-
-    # |> put_assoc(:project, attrs.project)
   end
 end
